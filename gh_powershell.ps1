@@ -9,21 +9,6 @@ Copyright 2024 Leonardo Evic
 # Show first half of logo
 Write-Host "gh-"
 
-# This things are for later
-<# Instantiate classes
-$mainPath = (Get-Location).Path + "/classes/main.ps1"
-. $mainPath
-
-# Get important information
-$main = [Main]::new()
-
-Write-Host $apiKey
-
-Write-Host #>
-
-$apiKey = Get-Content .\api.key
-Write-Host $apiKey
-
 # Try to make a connection to GitHub
 $loginParams = @{
     Uri = 'https://api.github.com/feeds'
@@ -36,6 +21,41 @@ $loginParams = @{
 
 $response = Invoke-WebRequest @loginParams
 
-($response.Content) | ConvertFrom-json
+# Check if it worked
+if ($response.StatusCode -ne "200") {
+    Write-Host "Connection did not succeed." -ForegroundColor Red
+    exit
+}
 
-$Session
+Write-Host "Connection to GitHub.com succeeded." -ForegroundColor Green
+
+$user = $response.Content | ConvertFrom-Json
+$user
+
+# Ask the user what he wants to do
+Write-Host
+"1 - List public repositories
+2 - List commits
+3 - List organizations"
+
+$input = Read-Host "Please select an option"
+
+$output = ""
+switch ($input) {
+    1 {
+        $webParams = @{
+            Uri = 'https://api.github.com/repositories'
+            Headers = @{
+                "Authorization" = "Bearer $apiKey";
+                "X-GitHub-Api-Version" = "2022-11-28"
+            }
+        }
+        $response = Invoke-WebRequest @webParams
+        $data = $response.Content | ConvertFrom-Json
+        $data | Foreach-Object {
+            $_.full_name
+        }
+    }
+}
+
+# $output
