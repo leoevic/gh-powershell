@@ -26,7 +26,7 @@ Write-Host $apiKey
 
 # Try to make a connection to GitHub
 $loginParams = @{
-    Uri = 'https://api.github.com/octocat'
+    Uri = 'https://api.github.com/feeds'
     Headers = @{
         "Authorization" = "Bearer $apiKey";
         "X-GitHub-Api-Version" = "2022-11-28";
@@ -36,6 +36,6 @@ $loginParams = @{
 
 $response = Invoke-WebRequest @loginParams
 
-$response
+($response.Content) | ConvertFrom-json
 
 $Session

@@ -7,5 +7,5 @@ Copyright 2024 Leonardo Evic
 #>
 
 class Main {
-    
+    [Input]$input
 }
